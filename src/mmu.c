@@ -57,6 +57,7 @@ void mmu_load_elf (mmu_t *mmu, int fd) {
 
     elf64_ehdr_t *ehdr = (elf64_ehdr_t *)buf;
 
+    //？
     if (*(u32 *)ehdr != *(u32 *)ELFMAG) {
         fatal ("bad elf file");
     }
@@ -69,10 +70,14 @@ void mmu_load_elf (mmu_t *mmu, int fd) {
 
     elf64_phdr_t phdr;
     for (i64 i = 0; i < ehdr->e_phnum; i++) {
+        
+        
         load_phdr (&phdr, ehdr, i, file);
+
+        if (phdr.p_type == PT_LOAD) {
+            mmu_load_segment(mmu, &phdr, fd);
+        }
     }
 
-    if (phdr.p_type == PT_LOAD) {
-        mmu_load_segment(mmu, &phdr, fd);
-    }
+    
 }
